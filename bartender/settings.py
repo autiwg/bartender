@@ -18,6 +18,7 @@ class Common(Configuration):
         "django.contrib.staticfiles",
         "djmoney",
         "rest_framework",
+        "rest_framework.authtoken",
         "drf_generators",
         "django_extensions",
         "debug_toolbar",
@@ -89,12 +90,25 @@ class Common(Configuration):
     STATIC_ROOT = os.path.join(BASE_DIR, "static")
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+    AWS_ACCESS_KEY_ID = values.SecretValue()
+    AWS_SECRET_ACCESS_KEY = values.SecretValue()
+    AWS_STORAGE_BUCKET_NAME = values.Value("bartender")
+    AWS_S3_ENDPOINT_URL = values.Value("https://s3.malik.consulting")
+
+    TELEGRAM_TOKEN = values.SecretValue()
+
     AUTH_USER_MODEL = "users.User"
 
     DEFAULT_CURRENCY = values.Value("EUR")
 
     REST_FRAMEWORK = {
         "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+        "DEFAULT_AUTHENTICATION_CLASSES": [
+            "rest_framework.authentication.TokenAuthentication",
+            "rest_framework.authentication.SessionAuthentication",
+        ],
         "PAGE_SIZE": 50,
     }
 

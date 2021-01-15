@@ -3,6 +3,7 @@ from django.db import models
 from djmoney.models.fields import MoneyField
 
 from bartender import settings
+from bartender.drinks.generators import generate_billed_document_path
 from bartender.mixins import BaseModel
 
 
@@ -13,6 +14,12 @@ class Crate(BaseModel):
         help_text="Whether this crate has been billed/emptied",
     )
     billed_at = models.DateTimeField(null=True, blank=True, editable=False)
+    billed_document = models.FileField(
+        verbose_name="Billing document",
+        upload_to=generate_billed_document_path,
+        editable=False,
+        null=True,
+    )
 
     name = models.CharField(max_length=255, verbose_name="Crate name")
     crate_price = MoneyField(

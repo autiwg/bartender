@@ -11,7 +11,7 @@ class CrateAccessPolicy(AccessPolicy):
             "effect": "allow",
         },
         {
-            "action": WRITE_ACTIONS,
+            "action": [WRITE_ACTIONS, "bill", "balance"],
             "principal": "authenticated",
             "effect": "allow",
             "condition": "user_must_be:is_staff",

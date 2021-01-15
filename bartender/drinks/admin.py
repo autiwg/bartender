@@ -9,6 +9,8 @@ class CrateAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "billed",
+        "billed_at",
+        "billed_document",
         "crate_price",
         "bottles",
         "calories",

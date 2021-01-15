@@ -7,7 +7,8 @@ class UserAccessPolicy(AccessPolicy):
             "action": "<safe_methods>",
             "principal": "authenticated",
             "effect": "allow",
-        }
+        },
+        {"action": "accept_invite", "principal": "*", "effect": "allow"},
     ]
 
     @classmethod

@@ -14,7 +14,7 @@ class Invite(BaseModel):
         related_name="created_invites",
     )
     token = models.CharField(
-        max_length=4, default=generate_invite_token, editable=False
+        max_length=4, default=generate_invite_token, editable=False, unique=True
     )
 
     @property
@@ -24,7 +24,7 @@ class Invite(BaseModel):
 
 class User(AbstractUser):
     telegram_id = models.BigIntegerField(
-        help_text="Telegram User ID", editable=False, null=True
+        help_text="Telegram User ID", editable=False, null=True, unique=True
     )
     invite = models.ForeignKey(
         Invite, null=True, on_delete=models.SET_NULL, related_name="invited_user"

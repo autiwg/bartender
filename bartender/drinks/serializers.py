@@ -15,6 +15,7 @@ class CrateSerializer(serializers.ModelSerializer):
             "id",
             "billed",
             "billed_at",
+            "billed_document",
             "created_at",
             "updated_at",
             "name",

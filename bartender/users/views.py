@@ -1,4 +1,5 @@
 from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from bartender.users.exceptions import InvalidInviteError
@@ -11,6 +12,7 @@ from bartender.users.serializers import (
     UserSerializer,
     TransactionSerializer,
     InviteSerializer,
+    UserInviteSignupSerializer,
 )
 from bartender.users.models import User, Transaction, Invite
 from bartender.view_mixins import AccessPolicyMixin
@@ -23,16 +25,10 @@ class UserViewSet(AccessPolicyMixin, ModelViewSet):
 
     @action(methods=["post"], detail=False)
     def accept_invite(self, request):
-        invite_token = request.data.pop("invite")
-        try:
-            invite = Invite.objects.get(
-                invite_token=invite_token,
-            )
-            assert invite.is_valid
-        except Invite.DoesNotExist:
-            raise InvalidInviteError("Provided invite code is invalid")
-        except AssertionError:
-            raise InvalidInviteError("Provided invite code has already been used")
+        serializer = UserInviteSignupSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=204)
 
 
 class TransactionViewSet(AccessPolicyMixin, ModelViewSet):
