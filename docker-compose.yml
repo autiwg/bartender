@@ -1,0 +1,70 @@
+version: "3"
+
+services:
+  beat:
+    image: bartender
+    command: ./start.sh --beat
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - postgres
+      - backend
+    environment:
+      DJANGO_CONFIGURATION: 'Production'
+      DJANGO_BROKER_URL: "redis://redis:6379/0"
+    restart: always
+
+  worker:
+    image: bartender
+    command: ./start.sh --worker
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - postgres
+    environment:
+      DJANGO_CONFIGURATION: 'Production'
+      DJANGO_BROKER_URL: "redis://redis:6379/0"
+    restart: always
+
+  redis:
+    image: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    hostname: redis
+    restart: always
+
+  backend:
+    image: bartender
+    restart: always
+    command: bash -c "while !</dev/tcp/postgres/5432; do sleep 1; done; ./start.sh --run"
+    env_file: .env
+    build: .
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres
+    volumes:
+      - media:/app/media
+      - static:/app/static
+    stdin_open: true
+    environment:
+      DJANGO_CONFIGURATION: Production
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data/pgdata/
+    environment:
+      POSTGRES_DB: pg
+      POSTGRES_USER: pg
+      POSTGRES_PASSWORD: pg
+      PGDATA: /var/lib/postgresql/data/pgdata/
+
+volumes:
+  pgdata:
+  media:
+  static:

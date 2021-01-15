@@ -1,0 +1,28 @@
+[tool]
+[tool.poetry]
+name = "bartender"
+description = "Bartender is an app for tracking drink consumption in a shared flat"
+version = "0.0.0"
+authors = ["Daniel Malik <mail@fronbasal.de>"]
+
+[tool.poetry.dependencies]
+python = "*"
+dj-database-url = "*"
+django = "*"
+django-configurations = "*"
+django-debug-toolbar = "*"
+django-extensions = "*"
+django-filter = "*"
+djangorestframework = "*"
+drf-extensions = "*"
+gunicorn = "*"
+markdown = "*"
+psycopg2-binary = "*"
+whitenoise = "*"
+django-money = "*"
+drf-generators = "*"
+drf-access-policy = "*"
+
+[tool.poetry.dev-dependencies]
+werkzeug = "*"
+ipython = "*"
