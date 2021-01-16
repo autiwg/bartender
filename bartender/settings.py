@@ -110,6 +110,11 @@ class Common(Configuration):
             "rest_framework.authentication.SessionAuthentication",
         ],
         "PAGE_SIZE": 50,
+        "DEFAULT_THROTTLE_CLASSES": [
+            "rest_framework.throttling.AnonRateThrottle",
+            "rest_framework.throttling.UserRateThrottle",
+        ],
+        "DEFAULT_THROTTLE_RATES": {"anon": "100/day", "user": "1000/day"},
     }
 
     DRF_ACCESS_POLICY = {"reusable_conditions": "bartender.global_access_conditions"}

@@ -5,6 +5,7 @@ from .routers import ExtendableRouter
 
 from .users.api import router as users_router
 from .drinks.api import router as drinks_router
+from .users.views import retrieve_token
 
 router = ExtendableRouter()
 router.extend(users_router)
@@ -14,6 +15,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("api/v1/", include(router.urls)),
+    path("api/v1/token/", retrieve_token),
 ]
 
 if settings.DEBUG:

@@ -1,6 +1,7 @@
 import requests
 from djmoney.contrib.django_rest_framework import MoneyField
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from bartender import settings
 from bartender.users.models import User, Transaction, Invite
@@ -15,7 +16,15 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserInviteSignupSerializer(serializers.ModelSerializer):
     invite = serializers.CharField(max_length=8, min_length=8)
-    telegram_id = serializers.CharField()
+    telegram_id = serializers.IntegerField(
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message="User with specified Telegram Chat ID already exists",
+            ),
+        ],
+        required=True,
+    )
 
     def __init__(self, *args, **kwargs):
         self._telegram_user = None
@@ -33,14 +42,9 @@ class UserInviteSignupSerializer(serializers.ModelSerializer):
         return value
 
     def validate_telegram_id(self, value):
-        res = requests.post(
-            "https://api.telegram.org/bot%s/getChat"
-            % getattr(settings, "TELEGRAM_TOKEN"),
-            json={"chat_id": value},
-        )
-        if not res.ok:
-            raise serializers.ValidationError("Invalid telegram chat_id provided")
-        self._telegram_user = res.json().get('result', None)
+        self._telegram_user = User.get_telegram_chat(value)
+        if self._telegram_user is None:
+            raise serializers.ValidationError("Telegram returned empty user data")
         return value
 
     def create(self, validated_data):

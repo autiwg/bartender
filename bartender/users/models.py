@@ -1,6 +1,8 @@
+import requests
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from bartender import settings
 from bartender.drinks.models import Crate
 from bartender.mixins import BaseModel
 from bartender.users.generators import generate_invite_token
@@ -32,6 +34,22 @@ class User(AbstractUser):
     transactions = models.ManyToManyField(
         to=Crate, related_name="transactions", through="Transaction"
     )
+
+    @staticmethod
+    def get_telegram_chat(telegram_id: int):
+        res = requests.post(
+            "https://api.telegram.org/bot%s/getChat"
+            % getattr(settings, "TELEGRAM_TOKEN"),
+            json={"chat_id": telegram_id},
+        )
+        if res.status_code != 200:
+            return None
+        return res.json().get("result", None)
+
+    def revalidate_telegram_id(self):
+        if self.telegram_id is None:
+            return False
+        return self.get_telegram_chat(self.telegram_id) is not None
 
 
 class Transaction(BaseModel):

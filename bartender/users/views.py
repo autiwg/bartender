@@ -1,8 +1,11 @@
-from rest_framework.decorators import action
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from bartender.users.exceptions import InvalidInviteError
+from bartender.users.exceptions import InvalidTelegramIDError
+from bartender.users.models import User, Transaction, Invite
 from bartender.users.permissions import (
     UserAccessPolicy,
     TransactionAccessPolicy,
@@ -14,7 +17,6 @@ from bartender.users.serializers import (
     InviteSerializer,
     UserInviteSignupSerializer,
 )
-from bartender.users.models import User, Transaction, Invite
 from bartender.view_mixins import AccessPolicyMixin
 
 
@@ -53,3 +55,23 @@ class InviteViewSet(AccessPolicyMixin, ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(created_by=self.request.user)
+
+
+@api_view(["post"])
+@permission_classes([AllowAny])
+def retrieve_token(request):
+    telegram_chat_id = request.data.get("telegram_id")
+    if telegram_chat_id is None:
+        raise InvalidTelegramIDError("No telegram_id provided")
+    try:
+        user = User.objects.get(telegram_id=telegram_chat_id)
+    except User.DoesNotExist:
+        raise InvalidTelegramIDError
+    if user.revalidate_telegram_id() is False:
+        user.delete()
+        raise InvalidTelegramIDError(
+            detail="Telegram returned invalid chat data, user delted",
+            code="invalid_user",
+        )
+    token, created = Token.objects.get_or_create(user=user)
+    return {"token": token}
