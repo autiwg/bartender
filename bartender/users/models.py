@@ -26,7 +26,7 @@ class Invite(BaseModel):
 
 class User(AbstractUser):
     telegram_id = models.BigIntegerField(
-        help_text="Telegram User ID", editable=False, null=True, unique=True
+        help_text="Telegram User ID", null=True, unique=True
     )
     invite = models.ForeignKey(
         Invite, null=True, on_delete=models.SET_NULL, related_name="invited_user"

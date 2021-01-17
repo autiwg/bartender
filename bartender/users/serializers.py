@@ -62,9 +62,20 @@ class UserInviteSignupSerializer(serializers.ModelSerializer):
 class TransactionSerializer(serializers.ModelSerializer):
     amount_total = MoneyField(max_digits=10, decimal_places=2, read_only=True)
 
+    crate_name = serializers.CharField(source="crate.name", read_only=True)
+
     class Meta:
         model = Transaction
-        fields = ("id", "user", "crate", "amount", "amount_total")
+        fields = (
+            "created_at",
+            "updated_at",
+            "id",
+            "user",
+            "crate",
+            "crate_name",
+            "amount",
+            "amount_total",
+        )
         extra_kwargs = map_kwargs("user", read_only=True)
 
 

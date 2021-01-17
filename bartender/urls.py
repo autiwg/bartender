@@ -16,6 +16,7 @@ urlpatterns = [
     path("api/auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("api/v1/", include(router.urls)),
     path("api/v1/token/", retrieve_token),
+    path(r"^api/hijack/", include("hijack.urls", namespace="hijack")),
 ]
 
 if settings.DEBUG:

@@ -16,10 +16,14 @@ class Common(Configuration):
         "django.contrib.messages",
         "whitenoise.runserver_nostatic",
         "django.contrib.staticfiles",
+        "hijack",
+        "hijack_admin",
+        "compat",
         "djmoney",
         "rest_framework",
         "rest_framework.authtoken",
         "drf_generators",
+        "django_filters",
         "django_extensions",
         "debug_toolbar",
         "bartender.users",
@@ -42,7 +46,7 @@ class Common(Configuration):
     TEMPLATES = [
         {
             "BACKEND": "django.template.backends.django.DjangoTemplates",
-            "DIRS": [],
+            "DIRS": [os.path.join(BASE_DIR, "templates")],
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
@@ -115,9 +119,17 @@ class Common(Configuration):
             "rest_framework.throttling.UserRateThrottle",
         ],
         "DEFAULT_THROTTLE_RATES": {"anon": "100/day", "user": "1000/day"},
+        "DEFAULT_FILTER_BACKENDS": [
+            "django_filters.rest_framework.DjangoFilterBackend"
+        ],
     }
 
     DRF_ACCESS_POLICY = {"reusable_conditions": "bartender.global_access_conditions"}
+
+    HIJACK_LOGIN_REDIRECT_URL = "/api/v1/"
+    HIJACK_LOGOUT_REDIRECT_URL = "/admin"
+    HIJACK_ALLOW_GET_REQUESTS = True
+    HIJACK_REGISTER_ADMIN = False
 
 
 class Development(Common):

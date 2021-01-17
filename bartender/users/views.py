@@ -1,7 +1,10 @@
+from django.shortcuts import redirect
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from rest_framework.viewsets import ModelViewSet
 
 from bartender.users.exceptions import InvalidTelegramIDError
@@ -34,9 +37,10 @@ class UserViewSet(AccessPolicyMixin, ModelViewSet):
 
 
 class TransactionViewSet(AccessPolicyMixin, ModelViewSet):
-    queryset = Transaction.objects.order_by("pk")
+    queryset = Transaction.objects.order_by("-created_at")
     serializer_class = TransactionSerializer
     permission_classes = (TransactionAccessPolicy,)
+    filter_fields = ("id", "user", "crate", "amount")
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -44,9 +48,16 @@ class TransactionViewSet(AccessPolicyMixin, ModelViewSet):
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
 
+    @action(methods=["post"], detail=True)
+    def increment(self, request, pk=None):
+        transaction = get_object_or_404(Transaction, id=pk)
+        transaction.amount += 1
+        transaction.save()
+        return redirect(reverse("transaction-detail", [pk]))
+
 
 class InviteViewSet(AccessPolicyMixin, ModelViewSet):
-    queryset = Invite.objects.all()
+    queryset = Invite.objects.order_by("-created_at")
     serializer_class = InviteSerializer
     permission_classes = (InviteAccessPolicy,)
 
@@ -74,4 +85,4 @@ def retrieve_token(request):
             code="invalid_user",
         )
     token, created = Token.objects.get_or_create(user=user)
-    return {"token": token}
+    return Response({"token": token.key})

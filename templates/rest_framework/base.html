@@ -1,0 +1,28 @@
+{% extends "rest_framework/base.html" %}
+{% load static %}
+{% load hijack_tags %}
+
+{% block style %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static 'hijack/hijack-styles.css' %}" />
+{% endblock %}
+
+{% block title %}
+  {% if name %}{{ name }} – {% endif %}Bartender API
+{% endblock %}
+
+{% block body %}
+  {{ block.super }}
+  {% hijack_notification %}
+{% endblock %}
+
+{% block script %}
+  {{ block.super }}
+  <style>
+      .hijacked-warning-default {
+          top: unset;
+          bottom: 0;
+          padding: 12px 26px;
+      }
+  </style>
+{% endblock %}

@@ -25,6 +25,8 @@ drf-extensions = {git = "https://github.com/chibisov/drf-extensions.git"}
 django-storages = "^1.11.1"
 requests = "^2.25.1"
 boto3 = "^1.16.55"
+django-hijack = "^2.1.10"
+django-hijack-admin = "^2.1.10"
 
 [tool.poetry.dev-dependencies]
 werkzeug = "*"

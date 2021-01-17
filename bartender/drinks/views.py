@@ -1,10 +1,11 @@
 import csv
 from io import StringIO
-from django.core.files.base import ContentFile
 
+from django.core.files.base import ContentFile
 from django.db.models import Sum
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.viewsets import ModelViewSet
@@ -20,6 +21,14 @@ class CrateViewSet(AccessPolicyMixin, ModelViewSet):
     serializer_class = CrateSerializer
     permission_classes = (CrateAccessPolicy,)
     queryset = Crate.objects.all()
+    pagination_class = None
+    filter_fields = (
+        "id",
+        "billed",
+        "name",
+        "billed_at",
+        "bottles",
+    )
 
     @action(methods=["get"], detail=True)
     def consumption(self, request, pk=None):
